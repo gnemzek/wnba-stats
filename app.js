@@ -180,7 +180,7 @@ function displayGames(games) {
             <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
         </div>
         
-        <div class="game-info state-${gameState}col-md-1">${displayStatus}</div>
+        <div class="game-info state-${gameState} col-md-1">${displayStatus}</div>
         </div>
         ${tvChannel ? `<div class="tv-tag">${tvChannel}</div>` : ''}
         `;
