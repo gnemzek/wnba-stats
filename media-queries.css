@@ -1,0 +1,28 @@
+/* Applies to screens 600px wide and smaller  */
+
+@media screen and (max-width: 600px) {
+
+    #status-banner,
+    h1 {
+        font-size: 2rem;
+    }
+
+    .team {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .game-card-inner-wrapper {
+        flex-direction: column;
+    }
+    
+    .game-card-inner-wrapper div {
+        justify-content: center;
+    }
+
+    .game-info {
+        margin-top: 10px;
+        margin: 10px auto;
+        display: block;
+    }
+}

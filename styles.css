@@ -57,29 +57,26 @@ body {
 
 /* Style your game cards layout */
 #games-list {
-    display: grid;
-    grid-template-columns: 1fr; /* Stack on mobile */
-    gap: 16px;
     margin-top: 30px;
 }
-
 .game-card {
+    margin-bottom: 20px;
+}
+
+.game-card-inner-wrapper {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--card-border);
     border-radius: calc(var(--radius) - 4px);
     padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     transition: var(--transition);
 }
 
-.game-card div {
+.game-card-inner-wrapper div {
     align-items: center;
 }
 
 /* Hover effect to make it feel interactive */
-.game-card:hover {
+.game-card-inner-wrapper:hover {
     transform: translateY(-2px);
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 92, 0, 0.3);
@@ -91,8 +88,6 @@ body {
     flex: 1;
 }
 
-.team.visitor { text-align: right; padding-right: 15px; }
-.team.home { text-align: left; padding-left: 15px; }
 
 .vs {
     font-size: 0.8rem;
@@ -152,19 +147,11 @@ h1 {
     gap: 12px;
 }
 
-.team.visitor {
-    justify-content: flex-end;
-}
 
-.team.home {
-    justify-content: flex-start;
-}
 
-/* Constrain the ESPN logos so they fit elegantly */
 .team-logo {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
+    width: 30px;
+    height: 30px;
 }
 
 .team-name {
@@ -178,12 +165,8 @@ h1 {
     font-variant-numeric: tabular-nums; /* Prevents shifting layouts on live changes */
 }
 
-/* Style the dynamic TV Network tag */
 .vs-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
 }
 
 .tv-tag {

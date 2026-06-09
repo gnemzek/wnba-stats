@@ -110,7 +110,7 @@ function displayGames(games) {
         const homeId = homeTeamData.team.id;
         const awayId = awayTeamData.team.id;
 
-        const gameStatus = game.status.type.detail;
+        const gameStatus = game.status.type.state;
         const broadcasts = game.competitions[0].broadcasts;
         const tvChannel = broadcasts && broadcasts.length > 0 ? broadcasts[0].names[0] : "";
 
@@ -137,25 +137,27 @@ function displayGames(games) {
 
         // If crunch time is true, we will inject our animated badge underneath the VS layout
         gameCard.innerHTML = `
-        <div class="team visitor">
+        <div class="game-card-inner-wrapper row">
+        <div class="team visitor col-md-5">
             <img src="${awayLogo}" alt="${awayName} logo" class="team-logo">
             <span class="team-name">${awayName}</span>
             <span class="team-score">${homeScore > 0 || awayScore > 0 ? awayScore : ''}</span>
         </div>
         
-        <div class="vs-container">
+        <div class="vs-container col-md-1">
             <div class="vs">@</div>
-            ${tvChannel ? `<div class="tv-tag">${tvChannel}</div>` : ''}
             ${isCrunchTime ? `<div class="crunch-time-tag">Close Game!</div>` : ''}
         </div>
         
-        <div class="team home">
+        <div class="team home col-md-5">
             <span class="team-score">${homeScore > 0 || awayScore > 0 ? homeScore : ''}</span>
             <span class="team-name">${homeName}</span>
             <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
         </div>
         
-        <div class="game-info">${gameStatus}</div>
+        <div class="game-info col-md-1">${gameStatus}</div>
+        </div>
+        ${tvChannel ? `<div class="tv-tag">${tvChannel}</div>` : ''}
         `;
 
 
