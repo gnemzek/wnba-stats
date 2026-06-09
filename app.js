@@ -78,15 +78,16 @@ function switchTab(event, offset) {
 function displayGames(games) {
     STATUS_BANNER.innerText = "";
     STATUS_BANNER.className = "yes-status";
+    
+    // 1. Prepare the layout grid (un-hide it while it's still at opacity 0)
     GAMES_LIST.classList.remove('hidden');
-    GAMES_LIST.innerHTML = '';
+    GAMES_LIST.classList.remove('fade-in-active'); 
+    GAMES_LIST.innerHTML = ''; 
 
     games.forEach(game => {
-        // Accessing ESPN's competitors array
         const homeTeamData = game.competitions[0].competitors[0];
         const awayTeamData = game.competitions[0].competitors[1];
 
-        // Extracting useful rich data points
         const homeName = homeTeamData.team.displayName;
         const homeLogo = homeTeamData.team.logo;
         const homeScore = homeTeamData.score;
@@ -95,10 +96,7 @@ function displayGames(games) {
         const awayLogo = awayTeamData.team.logo;
         const awayScore = awayTeamData.score;
 
-        // Get live game info (e.g., "7:00 PM ET", "Halftime", or "Final")
         const gameStatus = game.status.type.detail;
-
-        // Bonus: Grab the TV Channel if available (like "ESPN2" or "ION")
         const broadcasts = game.competitions[0].broadcasts;
         const tvChannel = broadcasts && broadcasts.length > 0 ? broadcasts[0].names[0] : "";
 
@@ -110,29 +108,38 @@ function displayGames(games) {
                 <span class="team-name">${awayName}</span>
                 <span class="team-score">${homeScore > 0 || awayScore > 0 ? awayScore : ''}</span>
             </div>
-            
             <div class="vs-container">
                 <div class="vs">@</div>
                 ${tvChannel ? `<div class="tv-tag">${tvChannel}</div>` : ''}
             </div>
-            
             <div class="team home">
                 <span class="team-score">${homeScore > 0 || awayScore > 0 ? homeScore : ''}</span>
                 <span class="team-name">${homeName}</span>
                 <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
             </div>
-            
             <div class="game-info">${gameStatus}</div>
         `;
         GAMES_LIST.appendChild(gameCard);
     });
+
+    // 2. Trigger the CSS transition with a microscopic timeout 
+    // This allows the browser to register the layout rendering before animating
+    setTimeout(() => {
+        GAMES_LIST.classList.add('fade-in-active');
+    }, 150);
 }
 
 function displayNoGames() {
     STATUS_BANNER.innerText = "";
-    STATUS_BANNER.style.color = "#777";
-    GAMES_LIST.innerHTML = `<p class="no-games-msg">No games scheduled for tonight. Check back tomorrow!</p>`;
+    STATUS_BANNER.className = "no-status";
+    
     GAMES_LIST.classList.remove('hidden');
+    GAMES_LIST.classList.remove('fade-in-active');
+    GAMES_LIST.innerHTML = `<p class="no-games-msg">No games scheduled. Check back soon!</p>`;
+    
+    setTimeout(() => {
+        GAMES_LIST.classList.add('fade-in-active');
+    }, 150);
 }
 
 // Initial Kick-off on page load (Today's date)
