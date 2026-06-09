@@ -115,7 +115,7 @@ body {
     text-align: center;
 }
 
-#status-banner {
+#status-banner, h1 {
     font-size: 5rem;
     font-weight: 900;
     text-transform: uppercase;
@@ -124,16 +124,12 @@ body {
     transition: var(--transition);
 }
 
-/* When JS triggers YES, add a glowing effect */
-.yes-status {
+/* Glowing effect */
+h1 {
     color: var(--wnba-orange);
     text-shadow: 0 0 20px rgba(255, 92, 0, 0.4);
 }
 
-/* When JS triggers NOPE, make it look cold and quiet */
-.no-status {
-    color: var(--text-muted);
-}
 
 .live-dot {
     width: 8px;
@@ -195,4 +191,38 @@ body {
     font-weight: 800;
     color: var(--wnba-orange);
     letter-spacing: 0.5px;
+}
+
+.date-tabs {
+    display: flex;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 4px;
+    border-radius: 30px;
+    margin: 20px 0 30px 0;
+    border: 1px solid var(--card-border);
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tab-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Active Tab Styles */
+.tab-btn.active {
+    background: var(--wnba-orange);
+    color: var(--text-main);
+    box-shadow: 0 4px 12px rgba(255, 92, 0, 0.3);
 }

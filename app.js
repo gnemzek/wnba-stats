@@ -1,37 +1,50 @@
 const GAMES_LIST = document.getElementById('games-list');
 const STATUS_BANNER = document.getElementById('status-banner');
 const DATE_DISPLAY = document.getElementById('current-date');
+const TAB_BUTTONS = document.querySelectorAll('.tab-btn');
 
 
-// 1. Keep 'today' exactly as it is for your frontend display text
-const today = new Date();
-DATE_DISPLAY.innerText = today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric'
-});
+// Helper function to format any date into ESPN's YYYYMMDD string format
+function getEspnDateString(offset = 0) {
+    const d = new Date();
+    d.setDate(d.getDate() + offset); // Shifts day backward or forward
+    
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    
+    return `${year}${month}${day}`;
+}
 
-// 2. Create a new date object specifically shifted 1 day forward for the API
-const apiDate = new Date();
-apiDate.setDate(today.getDate());
-
-// 3. Format the shifted date safely for the API request
-const year = apiDate.getFullYear();
-const month = String(apiDate.getMonth()).padStart(2, '0');
-const day = String(apiDate.getDate()).padStart(2, '0');
-
-const formattedDate = `${year}-${month}-${day}`;
-console.log("Successfully adjusted API target date to:", formattedDate);
+// Global variable to keep track of which day we are actively viewing
+let currentOffset = 0;
 
 
-async function checkGames() {
+async function checkGames(offset = 0) {
     try {
-        // Fetching directly from ESPN's live scoreboard
-        const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard');
-        const data = await response.json();
+        // Show loading state while switching tabs
+        GAMES_LIST.classList.add('hidden');
+        STATUS_BANNER.innerText = "Loading games...";
+        STATUS_BANNER.className = "loading";
 
-        // ESPN stores the day's text and the events array here
-        DATE_DISPLAY.innerText = data.day.date;
+        const dateStr = getEspnDateString(offset);
+        const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=${dateStr}`);
+        const data = await response.json();
+        
+        // SAFE DATE DISPLAY FIX:
+        // If ESPN doesn't return data.day.date, we generate the label locally
+        if (data.day && data.day.date) {
+            DATE_DISPLAY.innerText = data.day.date;
+        } else {
+            const labelDate = new Date();
+            labelDate.setDate(labelDate.getDate() + offset);
+            DATE_DISPLAY.innerText = labelDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
         const games = data.events;
 
         if (games && games.length > 0) {
@@ -41,12 +54,29 @@ async function checkGames() {
         }
     } catch (error) {
         console.error("Error fetching ESPN data:", error);
-        STATUS_BANNER.innerText = "Couldn't load live schedule.";
+        STATUS_BANNER.innerText = "Error loading matchups.";
+        STATUS_BANNER.className = "no-status";
     }
 }
 
+// Set up Event Listeners for the Navigation Buttons
+document.getElementById('btn-yesterday').addEventListener('click', (e) => switchTab(e, -1));
+document.getElementById('btn-today').addEventListener('click', (e) => switchTab(e, 0));
+document.getElementById('btn-tomorrow').addEventListener('click', (e) => switchTab(e, 1));
+
+function switchTab(event, offset) {
+    // 1. Remove active class from all buttons
+    TAB_BUTTONS.forEach(btn => btn.classList.remove('active'));
+    
+    // 2. Add active class to the button that was just clicked
+    event.target.classList.add('active');
+    
+    // 3. Fetch the new data
+    checkGames(offset);
+}
+
 function displayGames(games) {
-    STATUS_BANNER.innerText = "YES!";
+    STATUS_BANNER.innerText = "";
     STATUS_BANNER.className = "yes-status";
     GAMES_LIST.classList.remove('hidden');
     GAMES_LIST.innerHTML = '';
@@ -99,11 +129,11 @@ function displayGames(games) {
 }
 
 function displayNoGames() {
-    STATUS_BANNER.innerText = "NOPE.";
+    STATUS_BANNER.innerText = "";
     STATUS_BANNER.style.color = "#777";
     GAMES_LIST.innerHTML = `<p class="no-games-msg">No games scheduled for tonight. Check back tomorrow!</p>`;
     GAMES_LIST.classList.remove('hidden');
 }
 
-// Kick off the script
-checkGames();
+// Initial Kick-off on page load (Today's date)
+checkGames(0);
