@@ -272,3 +272,81 @@ h1 {
         box-shadow: 0 0 15px rgba(255, 92, 0, 0.6);
     }
 }
+
+/* Dark blurred backdrop overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Align box to the bottom of screen like mobile sheets */
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Slide up behavior when active */
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: #16161d;
+    width: 100%;
+    max-width: 600px;
+    border-top: 2px solid var(--card-border);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 30px;
+    position: relative;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+/* Modal Content Interior Elements */
+.modal-team-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modal-team-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.modal-record {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--wnba-orange);
+}
+
+/* Make your standard game cards look clickable on hover */
+.game-card {
+    cursor: pointer;
+}

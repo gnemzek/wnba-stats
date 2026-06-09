@@ -2,7 +2,18 @@ const GAMES_LIST = document.getElementById('games-list');
 const STATUS_BANNER = document.getElementById('status-banner');
 const DATE_DISPLAY = document.getElementById('current-date');
 const TAB_BUTTONS = document.querySelectorAll('.tab-btn');
+const MODAL = document.getElementById('team-modal');
+const MODAL_BODY = document.getElementById('modal-body');
+const CLOSE_MODAL_BTN = document.getElementById('close-modal');
 
+// Close modal handlers
+CLOSE_MODAL_BTN.addEventListener('click', closeModal);
+MODAL.addEventListener('click', (e) => { if (e.target === MODAL) closeModal(); });
+
+function closeModal() {
+    MODAL.classList.remove('active');
+    MODAL.classList.add('hidden'); // Ensure it display-none blocks again
+}
 
 // Helper function to format any date into ESPN's YYYYMMDD string format
 function getEspnDateString(offset = 0) {
@@ -142,6 +153,66 @@ function displayGames(games) {
         </div>
         
         <div class="game-info">${gameStatus}</div>`;
+
+
+        // Capture data points specifically for the modal sheet lookup
+        const homeRecord = homeTeamData.records && homeTeamData.records.length > 0 ? homeTeamData.records[0].summary : "0-0";
+        const awayRecord = awayTeamData.records && awayTeamData.records.length > 0 ? awayTeamData.records[0].summary : "0-0";
+
+        // ATTACH THE CLICK EVENT INTERCEPTOR TO THE CARD
+        // ATTACH THE CLICK EVENT INTERCEPTOR TO THE CARD
+        gameCard.addEventListener('click', () => {
+            // Debugging checkpoint to prove the click is reaching the code:
+            console.log("Card clicked for matchup:", awayName, "at", homeName);
+
+            // Safe Fallbacks: If records don't exist yet (like on future games), default to "0-0"
+            let homeRecord = "0-0";
+            if (homeTeamData.records && homeTeamData.records.length > 0 && homeTeamData.records[0].summary) {
+                homeRecord = homeTeamData.records[0].summary;
+            }
+
+            let awayRecord = "0-0";
+            if (awayTeamData.records && awayTeamData.records.length > 0 && awayTeamData.records[0].summary) {
+                awayRecord = awayTeamData.records[0].summary;
+            }
+
+            // Build custom HTML profile structure safely
+            MODAL_BODY.innerHTML = `
+                <h3 style="color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Matchup Details</h3>
+                
+                <div class="modal-team-row">
+                    <div class="modal-team-info">
+                        <img src="${awayLogo || ''}" style="width: 45px; height: 45px; object-fit: contain;">
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight:700;">${awayName || 'Away Team'}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Away</div>
+                        </div>
+                    </div>
+                    <div class="modal-record">${awayRecord}</div>
+                </div>
+
+                <div class="modal-team-row">
+                    <div class="modal-team-info">
+                        <img src="${homeLogo || ''}" style="width: 45px; height: 45px; object-fit: contain;">
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight:700;">${homeName || 'Home Team'}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Home</div>
+                        </div>
+                    </div>
+                    <div class="modal-record">${homeRecord}</div>
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+                    Broadcasted Live on: <strong style="color: white">${tvChannel || "Check local listings"}</strong>
+                </div>
+            `;
+            
+            // Pop the modal active state!
+            console.log("Opening modal sheet...");
+            MODAL.classList.remove('hidden');
+            MODAL.classList.add('active');
+        });
+
         GAMES_LIST.appendChild(gameCard);
     });
 
