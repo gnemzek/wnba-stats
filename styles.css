@@ -59,6 +59,7 @@ body {
 #games-list {
     margin-top: 30px;
 }
+
 .game-card {
     margin-bottom: 20px;
 }
@@ -73,6 +74,8 @@ body {
 
 .game-card-inner-wrapper div {
     align-items: center;
+    justify-self: center;
+    align-self: center;
 }
 
 /* Hover effect to make it feel interactive */
@@ -100,17 +103,49 @@ body {
 }
 
 .game-info {
-    font-size: 0.85rem;
-    color: var(--wnba-orange);
-    background: rgba(255, 92, 0, 0.1);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-weight: 600;
-    min-width: 70px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    padding: 6px 14px;
+    border-radius: 30px;
+    min-width: 85px;
     text-align: center;
+    font-variant-numeric: tabular-nums;
+    /* For shifting clocks layout */
+    color: var(--text-main);
+    transition: var(--transition);
 }
 
-#status-banner, h1 {
+
+.game-card:hover .game-info {
+    border-color: rgba(255, 92, 0, 0.4);
+    background: rgba(255, 92, 0, 0.05);
+}
+
+.game-info.state-in {
+    color: var(--wnba-orange);
+    background: rgba(255, 92, 0, 0.1);
+    border-color: rgba(255, 92, 0, 0.2);
+}
+
+/* Live */
+.game-info.state-pre {
+    color: var(--text-main);
+}
+
+/* Upcoming */
+.game-info.state-post {
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+
+/* Completed */
+
+#status-banner,
+h1 {
     font-size: 5rem;
     font-weight: 900;
     text-transform: uppercase;
@@ -135,9 +170,15 @@ h1 {
     margin-right: 6px;
     animation: blink 1s infinite alternate;
 }
+
 @keyframes blink {
-    from { opacity: 0.4; }
-    to { opacity: 1; }
+    from {
+        opacity: 0.4;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Align logos, names, and scores horizontally inside the teams */
@@ -162,7 +203,8 @@ h1 {
 .team-score {
     font-size: 1.4rem;
     font-weight: 800;
-    font-variant-numeric: tabular-nums; /* Prevents shifting layouts on live changes */
+    font-variant-numeric: tabular-nums;
+    /* Prevents shifting layouts on live changes */
 }
 
 .vs-container {
@@ -216,8 +258,8 @@ h1 {
 #games-list {
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Active state: Smoothly fades in and glides up into place */
@@ -251,6 +293,7 @@ h1 {
         transform: scale(0.97);
         box-shadow: 0 0 8px rgba(255, 51, 51, 0.3);
     }
+
     to {
         transform: scale(1.03);
         box-shadow: 0 0 15px rgba(255, 92, 0, 0.6);
@@ -268,7 +311,8 @@ h1 {
     backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
-    align-items: flex-end; /* Align box to the bottom of screen like mobile sheets */
+    align-items: flex-end;
+    /* Align box to the bottom of screen like mobile sheets */
     z-index: 1000;
     opacity: 0;
     pointer-events: none;

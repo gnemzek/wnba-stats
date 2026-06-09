@@ -114,9 +114,34 @@ function displayGames(games) {
         const broadcasts = game.competitions[0].broadcasts;
         const tvChannel = broadcasts && broadcasts.length > 0 ? broadcasts[0].names[0] : "";
 
-        // --- NEW: CRUNCH TIME ALERT LOGIC ---
         const gameState = game.status.type.state; // "pre", "in", or "post"
         const period = game.status.period; // 1, 2, 3, 4, or 5 (OT)
+        let displayStatus = "";
+
+        if (gameState === "pre") {
+            const utcTimeString = game.status.type.date || game.date;
+
+            if (utcTimeString) {
+                const gameDate = new Date(utcTimeString);
+
+                // 2. Explicitly force the formatting engine to evaluate in Central Time
+                displayStatus = gameDate.toLocaleTimeString('en-US', {
+                    timeZone: 'America/Chicago', // Forces CST/CDT math
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                }); // This will firmly output: "6:00 PM"
+
+            } else {
+                displayStatus = "TBD";
+            }
+        } else if (gameState === "in") {
+            // Live game: Displays the active game clock directly (e.g., "5:21 - 3rd")
+            displayStatus = game.status.type.detail;
+        } else if (gameState === "post") {
+            // Finished game
+            displayStatus = "FINAL";
+        }
 
         // Calculate point differential
         const scoreDifference = Math.abs(homeScore - awayScore);
@@ -155,7 +180,7 @@ function displayGames(games) {
             <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
         </div>
         
-        <div class="game-info col-md-1">${gameStatus}</div>
+        <div class="game-info state-${gameState}col-md-1">${displayStatus}</div>
         </div>
         ${tvChannel ? `<div class="tv-tag">${tvChannel}</div>` : ''}
         `;
@@ -182,7 +207,7 @@ function displayGames(games) {
                 <img src="${awayLogo || ''}" style="width: 45px; height: 45px; object-fit: contain;">
                 <div>
                     <div style="font-size: 1.2rem; font-weight:700;">${awayName || 'Away Team'}</div>
-                    <div style="font-size: 0.85rem; color: var(--text-muted);">Away Competitor</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Away</div>
                 </div>
             </div>
             <div class="modal-record">${awayRecord}</div>
@@ -193,7 +218,7 @@ function displayGames(games) {
                 <img src="${homeLogo || ''}" style="width: 45px; height: 45px; object-fit: contain;">
                 <div>
                     <div style="font-size: 1.2rem; font-weight:700;">${homeName || 'Home Team'}</div>
-                    <div style="font-size: 0.85rem; color: var(--text-muted);">Home Competitor</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Home</div>
                 </div>
             </div>
             <div class="modal-record">${homeRecord}</div>
@@ -280,7 +305,7 @@ async function fetchTeamStats(teamId) {
                     </div>
                     <div class="stat-box" style="grid-column: span 2">
                         <div class="stat-val" style="color: ${teamColor}">${totalRecord}</div>
-                        <div class="stat-lbl">Overall Standings Split</div>
+                        <div class="stat-lbl">Overall Record</div>
                     </div>
                 </div>
             </div>
