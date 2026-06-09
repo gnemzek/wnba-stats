@@ -107,6 +107,9 @@ function displayGames(games) {
         const awayLogo = awayTeamData.team.logo;
         const awayScore = parseInt(awayTeamData.score) || 0;
 
+        const homeId = homeTeamData.team.id;
+        const awayId = awayTeamData.team.id;
+
         const gameStatus = game.status.type.detail;
         const broadcasts = game.competitions[0].broadcasts;
         const tvChannel = broadcasts && broadcasts.length > 0 ? broadcasts[0].names[0] : "";
@@ -152,7 +155,8 @@ function displayGames(games) {
             <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
         </div>
         
-        <div class="game-info">${gameStatus}</div>`;
+        <div class="game-info">${gameStatus}</div>
+        `;
 
 
         // Capture data points specifically for the modal sheet lookup
@@ -160,55 +164,50 @@ function displayGames(games) {
         const awayRecord = awayTeamData.records && awayTeamData.records.length > 0 ? awayTeamData.records[0].summary : "0-0";
 
         // ATTACH THE CLICK EVENT INTERCEPTOR TO THE CARD
-        // ATTACH THE CLICK EVENT INTERCEPTOR TO THE CARD
         gameCard.addEventListener('click', () => {
-            // Debugging checkpoint to prove the click is reaching the code:
-            console.log("Card clicked for matchup:", awayName, "at", homeName);
-
-            // Safe Fallbacks: If records don't exist yet (like on future games), default to "0-0"
             let homeRecord = "0-0";
-            if (homeTeamData.records && homeTeamData.records.length > 0 && homeTeamData.records[0].summary) {
-                homeRecord = homeTeamData.records[0].summary;
-            }
+            if (homeTeamData.records && homeTeamData.records.length > 0) homeRecord = homeTeamData.records[0].summary;
 
             let awayRecord = "0-0";
-            if (awayTeamData.records && awayTeamData.records.length > 0 && awayTeamData.records[0].summary) {
-                awayRecord = awayTeamData.records[0].summary;
-            }
+            if (awayTeamData.records && awayTeamData.records.length > 0) awayRecord = awayTeamData.records[0].summary;
 
-            // Build custom HTML profile structure safely
             MODAL_BODY.innerHTML = `
-                <h3 style="color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Matchup Details</h3>
-                
-                <div class="modal-team-row">
-                    <div class="modal-team-info">
-                        <img src="${awayLogo || ''}" style="width: 45px; height: 45px; object-fit: contain;">
-                        <div>
-                            <div style="font-size: 1.2rem; font-weight:700;">${awayName || 'Away Team'}</div>
-                            <div style="font-size: 0.85rem; color: var(--text-muted);">Away</div>
-                        </div>
-                    </div>
-                    <div class="modal-record">${awayRecord}</div>
+        <h3 style="color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Matchup Details</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px;">Click a team to inspect seasonal stats</p>
+        
+        <div class="modal-team-row" id="row-${awayId}">
+            <div class="modal-team-info">
+                <img src="${awayLogo || ''}" style="width: 45px; height: 45px; object-fit: contain;">
+                <div>
+                    <div style="font-size: 1.2rem; font-weight:700;">${awayName || 'Away Team'}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Away Competitor</div>
                 </div>
+            </div>
+            <div class="modal-record">${awayRecord}</div>
+        </div>
 
-                <div class="modal-team-row">
-                    <div class="modal-team-info">
-                        <img src="${homeLogo || ''}" style="width: 45px; height: 45px; object-fit: contain;">
-                        <div>
-                            <div style="font-size: 1.2rem; font-weight:700;">${homeName || 'Home Team'}</div>
-                            <div style="font-size: 0.85rem; color: var(--text-muted);">Home</div>
-                        </div>
-                    </div>
-                    <div class="modal-record">${homeRecord}</div>
+        <div class="modal-team-row" id="row-${homeId}">
+            <div class="modal-team-info">
+                <img src="${homeLogo || ''}" style="width: 45px; height: 45px; object-fit: contain;">
+                <div>
+                    <div style="font-size: 1.2rem; font-weight:700;">${homeName || 'Home Team'}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Home Competitor</div>
                 </div>
-                
-                <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
-                    Broadcasted Live on: <strong style="color: white">${tvChannel || "Check local listings"}</strong>
-                </div>
-            `;
-            
-            // Pop the modal active state!
-            console.log("Opening modal sheet...");
+            </div>
+            <div class="modal-record">${homeRecord}</div>
+        </div>
+        
+        <div id="stats-area"></div>
+        
+        <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+            Broadcasted Live on: <strong style="color: white">${tvChannel || "Check local listings"}</strong>
+        </div>
+    `;
+
+            // ATTACH CLICK INTERCEPTORS TO THE MODAL ROWS
+            document.getElementById(`row-${awayId}`).addEventListener('click', () => fetchTeamStats(awayId));
+            document.getElementById(`row-${homeId}`).addEventListener('click', () => fetchTeamStats(homeId));
+
             MODAL.classList.remove('hidden');
             MODAL.classList.add('active');
         });
@@ -234,6 +233,60 @@ function displayNoGames() {
     setTimeout(() => {
         GAMES_LIST.classList.add('fade-in-active');
     }, 150);
+}
+
+async function fetchTeamStats(teamId) {
+    const statsArea = document.getElementById('stats-area');
+    statsArea.innerHTML = `<div class="team-stats-pane" style="text-align:center; color:var(--text-muted)">Loading team stats...</div>`;
+
+    try {
+        const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/${teamId}`);
+        const data = await response.json();
+        const team = data.team;
+
+        // Grab team color accents from ESPN's configuration, fallback to orange
+        const teamColor = team.color ? `#${team.color}` : 'var(--wnba-orange)';
+
+        // Safely extract the record types list
+        const recordItems = team.record?.items || [];
+
+        // Initialize placeholders
+        let totalRecord = "0-0";
+        let homeSplit = "0-0";
+        let roadSplit = "0-0";
+
+        // ESPN organizes splits as list objects inside items. Let's find them by name:
+        recordItems.forEach(item => {
+            if (item.type === "total") totalRecord = item.summary;
+            if (item.type === "home") homeSplit = item.summary;
+            if (item.type === "road") roadSplit = item.summary;
+        });
+
+        statsArea.innerHTML = `
+            <div class="team-stats-pane">
+                <h4 style="margin: 0 0 10px 0; color: ${teamColor}; font-size: 1.1rem; font-weight:800;">
+                    ${team.displayName} Seasonal Summary
+                </h4>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-val">${homeSplit}</div>
+                        <div class="stat-lbl">Home Record</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val">${roadSplit}</div>
+                        <div class="stat-lbl">Road Record</div>
+                    </div>
+                    <div class="stat-box" style="grid-column: span 2">
+                        <div class="stat-val" style="color: ${teamColor}">${totalRecord}</div>
+                        <div class="stat-lbl">Overall Standings Split</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error("Error pulling team detail sheet:", error);
+        statsArea.innerHTML = `<div class="team-stats-pane" style="color:red">Failed to pull stats records.</div>`;
+    }
 }
 
 // Initial Kick-off on page load (Today's date)
