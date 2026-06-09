@@ -1,0 +1,198 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #0f0f12 0%, #1a1a24 100%);
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --wnba-orange: #ff5c00;
+    --neon-glow: #ff8c00;
+    --text-main: #ffffff;
+    --text-muted: #8a8a93;
+
+    /* Layout constants */
+    --radius: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.tracker-container {
+    width: 100%;
+    max-width: 600px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Add a smooth pulse animation for the loading state */
+.loading {
+    font-size: 2rem;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Style your game cards layout */
+#games-list {
+    display: grid;
+    grid-template-columns: 1fr; /* Stack on mobile */
+    gap: 16px;
+    margin-top: 30px;
+}
+
+.game-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--card-border);
+    border-radius: calc(var(--radius) - 4px);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.game-card div {
+    align-items: center;
+}
+
+/* Hover effect to make it feel interactive */
+.game-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 92, 0, 0.3);
+}
+
+.team {
+    font-size: 1.1rem;
+    font-weight: 600;
+    flex: 1;
+}
+
+.team.visitor { text-align: right; padding-right: 15px; }
+.team.home { text-align: left; padding-left: 15px; }
+
+.vs {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.game-info {
+    font-size: 0.85rem;
+    color: var(--wnba-orange);
+    background: rgba(255, 92, 0, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    min-width: 70px;
+    text-align: center;
+}
+
+#status-banner {
+    font-size: 5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    margin: 20px 0;
+    transition: var(--transition);
+}
+
+/* When JS triggers YES, add a glowing effect */
+.yes-status {
+    color: var(--wnba-orange);
+    text-shadow: 0 0 20px rgba(255, 92, 0, 0.4);
+}
+
+/* When JS triggers NOPE, make it look cold and quiet */
+.no-status {
+    color: var(--text-muted);
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #ff3333;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    animation: blink 1s infinite alternate;
+}
+@keyframes blink {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
+}
+
+/* Align logos, names, and scores horizontally inside the teams */
+.team {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.team.visitor {
+    justify-content: flex-end;
+}
+
+.team.home {
+    justify-content: flex-start;
+}
+
+/* Constrain the ESPN logos so they fit elegantly */
+.team-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.team-name {
+    text-align: center;
+}
+
+/* Make the live score stand out slightly more than the name */
+.team-score {
+    font-size: 1.4rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums; /* Prevents shifting layouts on live changes */
+}
+
+/* Style the dynamic TV Network tag */
+.vs-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.tv-tag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--wnba-orange);
+    letter-spacing: 0.5px;
+}
