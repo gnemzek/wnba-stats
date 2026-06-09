@@ -8,11 +8,11 @@ const TAB_BUTTONS = document.querySelectorAll('.tab-btn');
 function getEspnDateString(offset = 0) {
     const d = new Date();
     d.setDate(d.getDate() + offset); // Shifts day backward or forward
-    
+
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    
+
     return `${year}${month}${day}`;
 }
 
@@ -30,7 +30,7 @@ async function checkGames(offset = 0) {
         const dateStr = getEspnDateString(offset);
         const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=${dateStr}`);
         const data = await response.json();
-        
+
         // SAFE DATE DISPLAY FIX:
         // If ESPN doesn't return data.day.date, we generate the label locally
         if (data.day && data.day.date) {
@@ -38,10 +38,10 @@ async function checkGames(offset = 0) {
         } else {
             const labelDate = new Date();
             labelDate.setDate(labelDate.getDate() + offset);
-            DATE_DISPLAY.innerText = labelDate.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                month: 'long', 
-                day: 'numeric' 
+            DATE_DISPLAY.innerText = labelDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
             });
         }
 
@@ -67,10 +67,10 @@ document.getElementById('btn-tomorrow').addEventListener('click', (e) => switchT
 function switchTab(event, offset) {
     // 1. Remove active class from all buttons
     TAB_BUTTONS.forEach(btn => btn.classList.remove('active'));
-    
+
     // 2. Add active class to the button that was just clicked
     event.target.classList.add('active');
-    
+
     // 3. Fetch the new data
     checkGames(offset);
 }
@@ -78,11 +78,11 @@ function switchTab(event, offset) {
 function displayGames(games) {
     STATUS_BANNER.innerText = "";
     STATUS_BANNER.className = "yes-status";
-    
+
     // 1. Prepare the layout grid (un-hide it while it's still at opacity 0)
     GAMES_LIST.classList.remove('hidden');
-    GAMES_LIST.classList.remove('fade-in-active'); 
-    GAMES_LIST.innerHTML = ''; 
+    GAMES_LIST.classList.remove('fade-in-active');
+    GAMES_LIST.innerHTML = '';
 
     games.forEach(game => {
         const homeTeamData = game.competitions[0].competitors[0];
@@ -90,35 +90,58 @@ function displayGames(games) {
 
         const homeName = homeTeamData.team.displayName;
         const homeLogo = homeTeamData.team.logo;
-        const homeScore = homeTeamData.score;
+        const homeScore = parseInt(homeTeamData.score) || 0;
 
         const awayName = awayTeamData.team.displayName;
         const awayLogo = awayTeamData.team.logo;
-        const awayScore = awayTeamData.score;
+        const awayScore = parseInt(awayTeamData.score) || 0;
 
         const gameStatus = game.status.type.detail;
         const broadcasts = game.competitions[0].broadcasts;
         const tvChannel = broadcasts && broadcasts.length > 0 ? broadcasts[0].names[0] : "";
 
+        // --- NEW: CRUNCH TIME ALERT LOGIC ---
+        const gameState = game.status.type.state; // "pre", "in", or "post"
+        const period = game.status.period; // 1, 2, 3, 4, or 5 (OT)
+
+        // Calculate point differential
+        const scoreDifference = Math.abs(homeScore - awayScore);
+
+        // Condition: Game is live ("in"), it's the 4th quarter or Overtime (period >= 4), 
+        // and the score deficit is 5 points or less.
+        let isCrunchTime = false;
+        if (gameState === "in" && period >= 3 && scoreDifference <= 6) {
+            isCrunchTime = true;
+        }
+
+        // -------------------------------------
+
+
+
         const gameCard = document.createElement('div');
         gameCard.className = 'game-card';
+
+        // If crunch time is true, we will inject our animated badge underneath the VS layout
         gameCard.innerHTML = `
-            <div class="team visitor">
-                <img src="${awayLogo}" alt="${awayName} logo" class="team-logo">
-                <span class="team-name">${awayName}</span>
-                <span class="team-score">${homeScore > 0 || awayScore > 0 ? awayScore : ''}</span>
-            </div>
-            <div class="vs-container">
-                <div class="vs">@</div>
-                ${tvChannel ? `<div class="tv-tag">${tvChannel}</div>` : ''}
-            </div>
-            <div class="team home">
-                <span class="team-score">${homeScore > 0 || awayScore > 0 ? homeScore : ''}</span>
-                <span class="team-name">${homeName}</span>
-                <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
-            </div>
-            <div class="game-info">${gameStatus}</div>
-        `;
+        <div class="team visitor">
+            <img src="${awayLogo}" alt="${awayName} logo" class="team-logo">
+            <span class="team-name">${awayName}</span>
+            <span class="team-score">${homeScore > 0 || awayScore > 0 ? awayScore : ''}</span>
+        </div>
+        
+        <div class="vs-container">
+            <div class="vs">@</div>
+            ${tvChannel ? `<div class="tv-tag">${tvChannel}</div>` : ''}
+            ${isCrunchTime ? `<div class="crunch-time-tag">Close Game!</div>` : ''}
+        </div>
+        
+        <div class="team home">
+            <span class="team-score">${homeScore > 0 || awayScore > 0 ? homeScore : ''}</span>
+            <span class="team-name">${homeName}</span>
+            <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
+        </div>
+        
+        <div class="game-info">${gameStatus}</div>`;
         GAMES_LIST.appendChild(gameCard);
     });
 
@@ -132,11 +155,11 @@ function displayGames(games) {
 function displayNoGames() {
     STATUS_BANNER.innerText = "";
     STATUS_BANNER.className = "no-status";
-    
+
     GAMES_LIST.classList.remove('hidden');
     GAMES_LIST.classList.remove('fade-in-active');
     GAMES_LIST.innerHTML = `<p class="no-games-msg">No games scheduled. Check back soon!</p>`;
-    
+
     setTimeout(() => {
         GAMES_LIST.classList.add('fade-in-active');
     }, 150);
