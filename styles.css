@@ -20,6 +20,24 @@ body {
     margin: 0;
 }
 
+h2 {
+    text-align: center;
+    color: rgba(255, 255, 255, .7);
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+h3 {
+    margin: 0 0 20px 0;
+    color: #ff5c00;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 800;
+    text-align: center;
+}
+
+
 /* Header Component Configuration */
 .dashboard-header {
     background: #14151f;
@@ -30,7 +48,7 @@ body {
     flex-direction: column;
     gap: 20px;
     margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Master Layout Framework */
@@ -55,18 +73,13 @@ body {
     border-radius: 16px;
     padding: 24px;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .game-card-inner-wrapper:hover {
     transform: translateY(-3px);
     border-color: rgba(255, 92, 0, 0.3);
     box-shadow: 0 8px 24px rgba(255, 92, 0, 0.08);
-}
-
-#current-date {
-    text-align: center;
-    font-size: 1.5rem;
 }
 
 /* Add a smooth pulse animation for the loading state */
@@ -94,22 +107,21 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.standings-card-header h3 {
-    margin: 0 0 20px 0;
-    color: #ff5c00;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-weight: 800;
+.feed-section {
+    background: #14151f;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 
 .date-tabs {
     margin: 0;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--card-bg);
     border-radius: 12px;
     padding: 4px;
 }
@@ -118,6 +130,10 @@ body {
     font-size: 1.1rem;
     font-weight: 600;
     flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-around;
 }
 
 
@@ -160,18 +176,51 @@ body {
     border-color: rgba(255, 92, 0, 0.2);
 }
 
-/* Live */
+/* Upcoming */
 .game-info.state-pre {
     color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Upcoming */
+/* Live */
+.game-info.state-in {
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff5c00 0%, #ff3333 100%);
+    border-color: #ff5c00;
+    box-shadow: 0 0 12px rgba(255, 92, 0, 0.3);
+    animation: liveStatusPulse 2s infinite ease-in-out;
+}
+
+@keyframes liveStatusPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 12px rgba(255, 92, 0, 0.3);
+    }
+
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 18px rgba(255, 92, 0, 0.5);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 12px rgba(255, 92, 0, 0.3);
+    }
+}
+
+/* Final */
 .game-info.state-post {
     color: var(--text-muted);
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.03);
     opacity: 0.6;
 }
 
-
+.game-card:has(.state-post) .team-name,
+.game-card:has(.state-post) .team-score {
+    color: var(--text-muted);
+}
 
 #status-banner,
 h1 {
@@ -211,14 +260,6 @@ h1 {
     }
 }
 
-/* Align logos, names, and scores horizontally inside the teams */
-.team {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-
 
 .team-logo {
     width: 30px;
@@ -249,6 +290,7 @@ h1 {
     color: var(--wnba-orange);
     letter-spacing: 0.5px;
     text-align: right;
+    margin-top: 2px;
 }
 
 .date-tabs {
@@ -456,7 +498,7 @@ h1 {
 }
 
 .modal-team-row:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--card-bg);
 }
 
 /* Layout Wrapper for Home View (To hold Games & Standings side-by-side on desktop) */
@@ -505,7 +547,7 @@ h1 {
 
 .sports-table td {
     padding: 10px 6px;
-    border-bottom: 1px solid rgba(255,255,255,0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
     vertical-align: middle;
 }
 
@@ -517,7 +559,8 @@ h1 {
 .roster-container {
     margin-top: 20px;
     max-height: 250px;
-    overflow-y: auto; /* Scrollable roster panel */
+    overflow-y: auto;
+    /* Scrollable roster panel */
     border-top: 1px solid var(--card-border);
     padding-top: 15px;
 }

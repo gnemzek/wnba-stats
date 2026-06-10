@@ -146,10 +146,10 @@ function displayGames(games) {
         // Calculate point differential
         const scoreDifference = Math.abs(homeScore - awayScore);
 
-        // Condition: Game is live ("in"), it's the 4th quarter or Overtime (period >= 4), 
+        // Condition: Game is live ("in"), it's the second half, 
         // and the score deficit is 5 points or less.
         let isCrunchTime = false;
-        if (gameState === "in" && period >= 3 && scoreDifference <= 6) {
+        if (gameState === "in" && period >= 3 && scoreDifference <= 5) {
             isCrunchTime = true;
         }
 
