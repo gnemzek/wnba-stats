@@ -287,16 +287,37 @@ async function fetchTeamStats(teamId) {
             if (item.type === "road") roadSplit = item.summary;
         });
 
-        // 📋 THE FLATTENED ROSTER PARSING ENGINE
-        // ESPN's rosterData has a top-level .athletes array with all players directly inside it!
+
         const playerList = rosterData.athletes || [];
+
+        const statPromises = playerList.map(async (player) => {
+            try {
+                
+                const extraStats = await loadPlayerStats(player.id);
+                console.log(extraStats);
+
+                
+                const ppg = extraStats.athlete.statsSummary.statistics[0].value;
+                const ppgRound = ppg.toFixed(1);
+
+                
+                return { ...player, ppg: ppgRound };
+            } catch (e) {
+                return { ...player, ppg: "--" }; // Fallback text on error
+            }
+        });
+
+        const enrichedPlayers = await Promise.all(statPromises);
+
         let rosterRowsHtml = "";
 
-        playerList.forEach(player => {
+        enrichedPlayers.forEach(player => {
+            console.log(player);
             rosterRowsHtml += `
                 <tr>
                     <td style="font-weight:600; color:white; padding: 6px 4px;">${player.displayName || 'Player'}</td>
                     <td style="color:var(--text-muted); padding: 6px 4px;">#${player.jersey || '--'}</td>
+                    <td style="color:var(--text-muted); padding: 6px 4px;">${player.ppg || '--'}</td>
                     <td style="text-align:right; color:var(--text-muted); font-size:0.8rem; padding: 6px 4px;">${player.position?.abbreviation || 'G'}</td>
                 </tr>
             `;
@@ -322,6 +343,7 @@ async function fetchTeamStats(teamId) {
                             <tr>
                                 <th>Player</th>
                                 <th>Jersey</th>
+                                <th>PPG</th>
                                 <th style="text-align:right">POS</th>
                             </tr>
                         </thead>
@@ -338,12 +360,18 @@ async function fetchTeamStats(teamId) {
     }
 }
 
+async function loadPlayerStats(playerID) {
+    const response = await fetch(`https://site.web.api.espn.com/apis/common/v3/sports/basketball/wnba/athletes/${playerID}`);
+    const playerInfo = await response.json();
+
+    return playerInfo;
+}
+
 async function loadLeagueStandings() {
     const tableZone = document.getElementById('standings-table-zone');
     try {
         const response = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/wnba/standings');
         const data = await response.json();
-        console.log(data);
 
         // 🔍 EXTRACT THE CONFERENCE ARRAYS SAFELY:
         // Checking both possible top-level array variations returned by ESPN
