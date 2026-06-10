@@ -8,28 +8,42 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
-     <link rel="stylesheet" href="media-queries.css">
+    <link rel="stylesheet" href="media-queries.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div class="tracker-container">
-        <header>
-            <h1 id="current-date"></h1>
-        </header>
 
-        <nav class="date-tabs">
-            <button class="tab-btn" id="btn-yesterday">Yesterday</button>
-            <button class="tab-btn active" id="btn-today">Today</button>
-            <button class="tab-btn" id="btn-tomorrow">Tomorrow</button>
-        </nav>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>WNBA Dashboard</h1>
+        </div>
+    </header>
 
-        <div id="status-banner" class="loading">Checking the schedule...</div>
+    <div class="dashboard-grid">
 
-        <main id="games-list" class="hidden"></main>
+        <section class="feed-section">
+            <div id="status-banner" class="loading">Syncing matchups...</div>
+            <nav class="date-tabs">
+                <button class="tab-btn" id="btn-yesterday">Yesterday</button>
+                <button class="tab-btn active" id="btn-today">Today</button>
+                <button class="tab-btn" id="btn-tomorrow">Tomorrow</button>
+            </nav>
+            <p id="current-date">Loading schedule...</p>
+            <main id="games-list" class="hidden"></main>
+        </section>
+
+        <aside class="standalone-standings">
+            <div class="standings-card-header">
+                <h3>League Standings</h3>
+            </div>
+            <div id="standings-table-zone">Loading matrix...</div>
+        </aside>
+
     </div>
+
 
     <div id="team-modal" class="modal-overlay hidden">
         <div class="modal-content">

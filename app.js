@@ -264,57 +264,160 @@ function displayNoGames() {
 
 async function fetchTeamStats(teamId) {
     const statsArea = document.getElementById('stats-area');
-    statsArea.innerHTML = `<div class="team-stats-pane" style="text-align:center; color:var(--text-muted)">Loading team stats...</div>`;
+    statsArea.innerHTML = `<div class="team-stats-pane" style="text-align:center; color:var(--text-muted)">Loading profile data sheets...</div>`;
 
     try {
-        const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/${teamId}`);
-        const data = await response.json();
-        const team = data.team;
+        // Run both team detail and roster queries concurrently!
+        const [teamResponse, rosterResponse] = await Promise.all([
+            fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/${teamId}`),
+            fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/${teamId}/roster`)
+        ]);
 
-        // Grab team color accents from ESPN's configuration, fallback to orange
+        const teamData = await teamResponse.json();
+        const rosterData = await rosterResponse.json();
+
+        const team = teamData.team;
         const teamColor = team.color ? `#${team.color}` : 'var(--wnba-orange)';
-
-        // Safely extract the record types list
         const recordItems = team.record?.items || [];
 
-        // Initialize placeholders
-        let totalRecord = "0-0";
-        let homeSplit = "0-0";
-        let roadSplit = "0-0";
-
-        // ESPN organizes splits as list objects inside items. Let's find them by name:
+        let totalRecord = "0-0", homeSplit = "0-0", roadSplit = "0-0";
         recordItems.forEach(item => {
             if (item.type === "total") totalRecord = item.summary;
             if (item.type === "home") homeSplit = item.summary;
             if (item.type === "road") roadSplit = item.summary;
         });
 
+        // 📋 THE FLATTENED ROSTER PARSING ENGINE
+        // ESPN's rosterData has a top-level .athletes array with all players directly inside it!
+        const playerList = rosterData.athletes || [];
+        let rosterRowsHtml = "";
+
+        playerList.forEach(player => {
+            rosterRowsHtml += `
+                <tr>
+                    <td style="font-weight:600; color:white; padding: 6px 4px;">${player.displayName || 'Player'}</td>
+                    <td style="color:var(--text-muted); padding: 6px 4px;">#${player.jersey || '--'}</td>
+                    <td style="text-align:right; color:var(--text-muted); font-size:0.8rem; padding: 6px 4px;">${player.position?.abbreviation || 'G'}</td>
+                </tr>
+            `;
+        });
+
+        // Combine stats boxes layout with our fixed roster table!
         statsArea.innerHTML = `
             <div class="team-stats-pane">
                 <h4 style="margin: 0 0 10px 0; color: ${teamColor}; font-size: 1.1rem; font-weight:800;">
-                    ${team.displayName} Seasonal Summary
+                    ${team.displayName} Summary
                 </h4>
+                
                 <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-val">${homeSplit}</div>
-                        <div class="stat-lbl">Home Record</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-val">${roadSplit}</div>
-                        <div class="stat-lbl">Road Record</div>
-                    </div>
-                    <div class="stat-box" style="grid-column: span 2">
-                        <div class="stat-val" style="color: ${teamColor}">${totalRecord}</div>
-                        <div class="stat-lbl">Overall Record</div>
-                    </div>
+                    <div class="stat-box"><div class="stat-val">${homeSplit}</div><div class="stat-lbl">Home Rec</div></div>
+                    <div class="stat-box"><div class="stat-val">${roadSplit}</div><div class="stat-lbl">Road Rec</div></div>
+                    <div class="stat-box" style="grid-column: span 2"><div class="stat-val" style="color:${teamColor}">${totalRecord}</div><div class="stat-lbl">Overall Standings</div></div>
+                </div>
+
+                <div class="roster-container">
+                    <div class="roster-title" style="color:${teamColor}">Active Roster</div>
+                    <table class="sports-table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Jersey</th>
+                                <th style="text-align:right">POS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rosterRowsHtml || '<tr><td colspan="3" style="color:var(--text-muted)">No roster found.</td></tr>'}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         `;
     } catch (error) {
-        console.error("Error pulling team detail sheet:", error);
-        statsArea.innerHTML = `<div class="team-stats-pane" style="color:red">Failed to pull stats records.</div>`;
+        console.error("Error pulling complete team sheet details:", error);
+        statsArea.innerHTML = `<div class="team-stats-pane" style="color:red">Failed to map complete profiles data.</div>`;
     }
 }
 
+async function loadLeagueStandings() {
+    const tableZone = document.getElementById('standings-table-zone');
+    try {
+        const response = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/wnba/standings');
+        const data = await response.json();
+
+        // 🔍 EXTRACT THE CONFERENCE ARRAYS SAFELY:
+        // Checking both possible top-level array variations returned by ESPN
+        const conferences = data.children || data.standings?.children || data.groups || [];
+
+        let tableHtml = `
+            <table class="sports-table">
+                <thead>
+                    <tr>
+                        <th>Team</th>
+                        <th style="text-align:center">W</th>
+                        <th style="text-align:center">L</th>
+                        <th style="text-align:right">GB</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        if (conferences.length === 0) {
+            tableZone.innerHTML = `<p style="color:var(--text-muted); font-size:0.8rem;">Standings array structure mismatch.</p>`;
+            return;
+        }
+
+        // Loop over each conference block (Eastern and Western)
+        conferences.forEach(conf => {
+            const conferenceName = conf.displayName || "Conference";
+
+            // Extract the actual teams list array inside this conference
+            const teamsList = conf.standings?.entries || conf.entries || [];
+
+            // 1. Add a visually distinct header banner for the Conference Row
+            tableHtml += `
+                <tr>
+                    <td colspan="4" style="background: rgba(255,255,255,0.02); color: var(--wnba-orange); font-size: 0.75rem; font-weight: 800; padding: 8px 6px; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid var(--card-border);">
+                        ${conferenceName}
+                    </td>
+                </tr>
+            `;
+
+            // 2. Loop through every team entry inside this specific conference array
+            teamsList.forEach(entry => {
+                const teamName = entry.team?.displayName || "WNBA Team";
+                const teamLogo = entry.team?.logos?.[0]?.href || "";
+                const shortName = entry.team?.shortDisplayName || teamName;
+
+                // Pull out statistics parameters accurately from the list arrays
+                const stats = entry.stats || [];
+                const wins = stats.find(s => s.name === "wins" || s.type === "wins")?.value || 0;
+                const losses = stats.find(s => s.name === "losses" || s.type === "losses")?.value || 0;
+
+                // Games Behind (GB) metric calculation
+                const gb = stats.find(s => s.name === "gamesBehind" || s.type === "gamesbehind")?.displayValue || "0.0";
+
+                tableHtml += `
+                    <tr>
+                        <td style="display:flex; align-items:center; gap:8px; font-weight:600; border-bottom: none;">
+                            <img src="${teamLogo}" style="width:18px; height:18px; object-fit:contain;">
+                            <span>${shortName}</span>
+                        </td>
+                        <td style="text-align:center; font-weight:700; color:white;">${wins}</td>
+                        <td style="text-align:center; color:var(--text-muted);">${losses}</td>
+                        <td style="text-align:right; font-size:0.75rem; color:var(--text-muted); font-weight:600;">${gb}</td>
+                    </tr>
+                `;
+            });
+        });
+
+        tableHtml += `</tbody></table>`;
+        tableZone.innerHTML = tableHtml;
+
+    } catch (error) {
+        console.error("Standings loading failure:", error);
+        tableZone.innerHTML = `<p style="color:var(--text-muted); font-size:0.8rem;">Standings panel currently offline.</p>`;
+    }
+}
 // Initial Kick-off on page load (Today's date)
+loadLeagueStandings();
 checkGames(0);

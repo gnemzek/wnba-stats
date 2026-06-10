@@ -22,3 +22,23 @@
         display: block;
     }
 }
+
+@media screen and (min-width: 900px) {
+    .dashboard-grid {
+        grid-template-columns: 1.6fr 1fr; /* Games on left, standings on right */
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .dashboard-header {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 2fr 1fr; /* Games occupy left 66%, Standings on right 33% */
+    }
+}
