@@ -343,6 +343,7 @@ async function loadLeagueStandings() {
     try {
         const response = await fetch('https://site.api.espn.com/apis/v2/sports/basketball/wnba/standings');
         const data = await response.json();
+        console.log(data);
 
         // 🔍 EXTRACT THE CONFERENCE ARRAYS SAFELY:
         // Checking both possible top-level array variations returned by ESPN
@@ -368,7 +369,7 @@ async function loadLeagueStandings() {
 
         // Loop over each conference block (Eastern and Western)
         conferences.forEach(conf => {
-            const conferenceName = conf.displayName || "Conference";
+            const conferenceName = conf.name || "Conference";
 
             // Extract the actual teams list array inside this conference
             const teamsList = conf.standings?.entries || conf.entries || [];
