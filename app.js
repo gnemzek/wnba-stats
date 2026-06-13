@@ -95,6 +95,8 @@ function displayGames(games) {
     GAMES_LIST.classList.remove('fade-in-active');
     GAMES_LIST.innerHTML = '';
 
+    console.log(games);
+
     games.forEach(game => {
         const homeTeamData = game.competitions[0].competitors[0];
         const awayTeamData = game.competitions[0].competitors[1];
@@ -102,10 +104,12 @@ function displayGames(games) {
         const homeName = homeTeamData.team.displayName;
         const homeLogo = homeTeamData.team.logo;
         const homeScore = parseInt(homeTeamData.score) || 0;
+        const homeTeamRecord = homeTeamData.records[0].summary;
 
         const awayName = awayTeamData.team.displayName;
         const awayLogo = awayTeamData.team.logo;
         const awayScore = parseInt(awayTeamData.score) || 0;
+        const awayTeamRecord = awayTeamData.records[1].summary;
 
         const homeId = homeTeamData.team.id;
         const awayId = awayTeamData.team.id;
@@ -160,12 +164,12 @@ function displayGames(games) {
         const gameCard = document.createElement('div');
         gameCard.className = 'game-card';
 
-        // If crunch time is true, we will inject our animated badge underneath the VS layout
+       
         gameCard.innerHTML = `
         <div class="game-card-inner-wrapper row">
         <div class="team visitor col-md-5">
             <img src="${awayLogo}" alt="${awayName} logo" class="team-logo">
-            <span class="team-name">${awayName}</span>
+            <span class="team-name">${awayName}<br><span class="team-record">${awayTeamRecord}</span></span>
             <span class="team-score">${homeScore > 0 || awayScore > 0 ? awayScore : ''}</span>
         </div>
         
@@ -176,7 +180,7 @@ function displayGames(games) {
         
         <div class="team home col-md-5">
             <span class="team-score">${homeScore > 0 || awayScore > 0 ? homeScore : ''}</span>
-            <span class="team-name">${homeName}</span>
+            <span class="team-name">${homeName}<br><span class="team-record">${homeTeamRecord}</span></span>
             <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
         </div>
         

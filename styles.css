@@ -270,6 +270,10 @@ h1 {
     text-align: center;
 }
 
+span.team-record {
+    font-size: .9rem;
+}
+
 /* Make the live score stand out slightly more than the name */
 .team-score {
     font-size: 1.4rem;
