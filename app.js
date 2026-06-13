@@ -109,7 +109,7 @@ function displayGames(games) {
         const awayName = awayTeamData.team.displayName;
         const awayLogo = awayTeamData.team.logo;
         const awayScore = parseInt(awayTeamData.score) || 0;
-        const awayTeamRecord = awayTeamData.records[1].summary;
+        const awayTeamRecord = awayTeamData.records[0].summary;
 
         const homeId = homeTeamData.team.id;
         const awayId = awayTeamData.team.id;
