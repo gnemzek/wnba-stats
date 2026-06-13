@@ -162,6 +162,7 @@ h3 {
     /* For shifting clocks layout */
     color: var(--text-main);
     transition: var(--transition);
+    align-self: center;
 }
 
 
@@ -286,6 +287,7 @@ span.team-record {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
 .tv-tag {

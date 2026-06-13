@@ -167,24 +167,24 @@ function displayGames(games) {
        
         gameCard.innerHTML = `
         <div class="game-card-inner-wrapper row">
-        <div class="team visitor col-md-5">
+        <div class="team visitor col-md-4">
             <img src="${awayLogo}" alt="${awayName} logo" class="team-logo">
-            <span class="team-name">${awayName}<br><span class="team-record">${awayTeamRecord}</span></span>
+            <span class="team-name">${awayName}<br><span class="team-record">(${awayTeamRecord})</span></span>
             <span class="team-score">${homeScore > 0 || awayScore > 0 ? awayScore : ''}</span>
         </div>
         
-        <div class="vs-container col-md-1">
+        <div class="vs-container col-md-2">
             <div class="vs">@</div>
             ${isCrunchTime ? `<div class="crunch-time-tag">Close Game!</div>` : ''}
         </div>
         
-        <div class="team home col-md-5">
+        <div class="team home col-md-4">
             <span class="team-score">${homeScore > 0 || awayScore > 0 ? homeScore : ''}</span>
-            <span class="team-name">${homeName}<br><span class="team-record">${homeTeamRecord}</span></span>
+            <span class="team-name">${homeName}<br><span class="team-record">(${homeTeamRecord})</span></span>
             <img src="${homeLogo}" alt="${homeName} logo" class="team-logo">
         </div>
         
-        <div class="game-info state-${gameState} col-md-1">${displayStatus}</div>
+        <div class="game-info state-${gameState} col-md-2">${displayStatus}</div>
         </div>
         ${tvChannel ? `<div class="tv-tag">${tvChannel}</div>` : ''}
         `;
