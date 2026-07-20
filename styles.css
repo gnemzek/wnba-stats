@@ -20,6 +20,12 @@ body {
     margin: 0;
 }
 
+@media (max-width: 800px) {
+  body {
+    padding: 10px;
+  }
+}
+
 h2 {
     text-align: center;
     color: rgba(255, 255, 255, .7);
