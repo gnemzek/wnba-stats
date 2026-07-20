@@ -578,3 +578,78 @@ span.team-record {
     text-transform: uppercase;
     color: var(--text-main);
 }
+
+.game-card .highlight-fav {
+    border: 2px solid #ff6b00 !important;
+    background-color: rgba(255, 107, 0, 0.1) !important;
+    border-radius: 16px;
+}
+
+.fav-team-container {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Container for the controls */
+.dashboard-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2rem;
+    font-family: inherit;
+}
+
+.fav-team-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Style the text label */
+.fav-team-container label {
+    color: #a1a1aa;
+    /* Light gray text */
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Style the actual Select Dropdown */
+#fav-team-select {
+    appearance: none;
+    /* Removes default browser styling (crucial!) */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #1e1e1e;
+    color: #f4f4f5;
+    border: 1px solid #3f3f46;
+    border-radius: 6px;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    /* Custom custom arrow icon via a SVG data URI */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+/* Hover & Focus States */
+#fav-team-select:hover {
+    border-color: #71717a;
+}
+
+#fav-team-select:focus {
+    border-color: #ff6b00;
+    box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+}
+
+#fav-team-select option {
+    background-color: #1e1e1e;
+    color: #f4f4f5;
+}

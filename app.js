@@ -95,8 +95,6 @@ function displayGames(games) {
     GAMES_LIST.classList.remove('fade-in-active');
     GAMES_LIST.innerHTML = '';
 
-    console.log(games);
-
     games.forEach(game => {
         const homeTeamData = game.competitions[0].competitors[0];
         const awayTeamData = game.competitions[0].competitors[1];
@@ -164,7 +162,7 @@ function displayGames(games) {
         const gameCard = document.createElement('div');
         gameCard.className = 'game-card';
 
-       
+
         gameCard.innerHTML = `
         <div class="game-card-inner-wrapper row">
         <div class="team visitor col-md-4">
@@ -296,15 +294,15 @@ async function fetchTeamStats(teamId) {
 
         const statPromises = playerList.map(async (player) => {
             try {
-                
+
                 const extraStats = await loadPlayerStats(player.id);
                 console.log(extraStats);
 
-                
+
                 const ppg = extraStats.athlete.statsSummary.statistics[0].value;
                 const ppgRound = ppg.toFixed(1);
 
-                
+
                 return { ...player, ppg: ppgRound };
             } catch (e) {
                 return { ...player, ppg: "--" }; // Fallback text on error
@@ -454,3 +452,45 @@ async function loadLeagueStandings() {
 // Initial Kick-off on page load (Today's date)
 loadLeagueStandings();
 checkGames(0);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const teamSelect = document.getElementById('fav-team-select');
+
+    // ==========================================
+    // FAVORITE TEAM LOGIC
+    // ==========================================
+
+    // Check localStorage on load for a favorite team
+    const savedTeam = localStorage.getItem('favoriteTeam');
+    if (savedTeam) {
+        teamSelect.value = savedTeam;
+        // We run this after a short delay to ensure your standings/schedule data has finished fetching/rendering
+        setTimeout(() => highlightFavoriteTeam(savedTeam), 500);
+    }
+
+    // Listen for changes on the dropdown
+    teamSelect.addEventListener('change', (e) => {
+        const selectedTeam = e.target.value;
+        localStorage.setItem('favoriteTeam', selectedTeam);
+        highlightFavoriteTeam(selectedTeam);
+    });
+});
+
+// Function to find elements in the DOM and apply the highlight class
+function highlightFavoriteTeam(teamName) {
+    // First, remove existing highlights from all elements
+    document.querySelectorAll('.highlight-fav').forEach(el => {
+        el.classList.remove('highlight-fav');
+    });
+
+    if (!teamName) return; // If "None" is selected, stop here
+
+    // Find and highlight team in Standings Matrix or Schedule
+    // Note: You will need to adjust these selectors to match your actual HTML classes/data attributes!
+    document.querySelectorAll('.game-card, .team').forEach(item => {
+        // Assuming your elements contain the team name text or a data attribute like data-team="Lynx"
+        if (item.textContent.includes(teamName) || item.dataset.team === teamName) {
+            item.classList.add('highlight-fav');
+        }
+    });
+}

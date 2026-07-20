@@ -18,13 +18,39 @@
 
     <header class="dashboard-header">
         <div class="header-content">
-            <h1>WNBA Dashboard</h1>
+
+                <h1>WNBA Dashboard</h1>
+     
         </div>
     </header>
 
     <div class="dashboard-grid">
 
         <section class="feed-section">
+                <div class="dashboard-controls">
+
+                    <div class="fav-team-container">
+                        <label for="fav-team-select">⭐ Favorite Team:</label>
+                        <select id="fav-team-select">
+                            <option value="">None</option>
+                            <option value="Dream">Atlanta Dream</option>
+                            <option value="Sky">Chicago Sky</option>
+                            <option value="Sun">Connecticut Sun</option>
+                            <option value="Wings">Dallas Wings</option>
+                            <option value="Valkyries">Golden State Valkyries</option>
+                            <option value="Fever">Indiana Fever</option>
+                            <option value="Aces">Las Vegas Aces</option>
+                            <option value="Sparks">Los Angeles Sparks</option>
+                            <option value="Lynx">Minnesota Lynx</option>
+                            <option value="Liberty">New York Liberty</option>
+                            <option value="Mercury">Phoenix Mercury</option>
+                            <option value="Fire">Portland Fire</option>
+                            <option value="Storm">Seattle Storm</option>
+                            <option value="Tempo">Toronto Tempo</option>
+                            <option value="Mystics">Washington Mystics</option>
+                        </select>
+                    </div>
+                </div>
             <h2>Schedule</h2>
             <div id="status-banner" class="loading">Syncing matchups...</div>
             <nav class="date-tabs">
