@@ -279,6 +279,7 @@ async function fetchTeamStats(teamId) {
         const rosterData = await rosterResponse.json();
 
         const team = teamData.team;
+        console.log(team);
         const teamColor = team.color ? `#${team.color}` : 'var(--wnba-orange)';
         const recordItems = team.record?.items || [];
 
@@ -491,6 +492,132 @@ function highlightFavoriteTeam(teamName) {
         // Assuming your elements contain the team name text or a data attribute like data-team="Lynx"
         if (item.textContent.includes(teamName) || item.dataset.team === teamName) {
             item.classList.add('highlight-fav');
+        }
+    });
+}
+// A global variable to hold the active chart instance. 
+// This lets us destroy old versions when new teams are chosen.
+let teamChartInstance = null; 
+
+// A global database placeholder (assuming you fetch all team data objects on page load)
+// e.g., teamsData = { "8": { ...Lynx data... }, "14": { ...Storm data... } }
+let allTeamsData = {}; 
+
+document.addEventListener('DOMContentLoaded', () => {
+    const selectA = document.getElementById('team-a-select');
+    const selectB = document.getElementById('team-b-select');
+
+    // Helper function to fetch data directly for a specific team ID
+    async function getTeamData(teamId) {
+        if (!teamId) return null;
+        try {
+            const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/${teamId}`);
+            const data = await response.json();
+            return data.team; // Returns the exact nested "team" object your chart function expects
+        } catch (error) {
+            console.error(`Failed to fetch stats for team ${teamId}:`, error);
+            return null;
+        }
+    }
+
+    // Function that runs every time a select box updates
+    async function handleDropdownChange() {
+        const teamAId = selectA.value;
+        const teamBId = selectB.value;
+
+        // Only proceed if BOTH dropdown options have selected values
+        if (teamAId && teamBId) {
+            // Fetch both deep data records simultaneously using Promise.all
+            const [teamAData, teamBData] = await Promise.all([
+                getTeamData(teamAId),
+                getTeamData(teamBId)
+            ]);
+            
+            // If both downloads completed cleanly, send them straight to your chart renderer!
+            if (teamAData && teamBData) {
+                renderTeamComparisonChart(teamAData, teamBData);
+            }
+        }
+    }
+
+    // Connect the drop downs to our fresh async handler
+    selectA.addEventListener('change', handleDropdownChange);
+    selectB.addEventListener('change', handleDropdownChange);
+});
+
+
+function renderTeamComparisonChart(teamA, teamB) {
+    // CRUCIAL: If a chart already exists, destroy it before building the new one
+    if (teamChartInstance !== null) {
+        teamChartInstance.destroy();
+    }
+
+    // Safely search statistics using optional chaining (?.) and fallbacks (||)
+    const getOverallStat = (teamObj, statName) => {
+        const recordItems = teamObj.record?.items || [];
+        const overallRecord = recordItems.find(item => item.type === 'total');
+        
+        if (!overallRecord || !overallRecord.stats) return 0; // Return 0 if the API doesn't have data
+        
+        const matchingStat = overallRecord.stats.find(s => s.name === statName);
+        return matchingStat ? matchingStat.value : 0;
+    };
+
+    const teamAPPG = getOverallStat(teamA, 'avgPointsFor');
+    const teamAOPPG = getOverallStat(teamA, 'avgPointsAgainst');
+    const teamAWins = getOverallStat(teamA, 'wins');
+
+    const teamBPPG = getOverallStat(teamB, 'avgPointsFor');
+    const teamBOPPG = getOverallStat(teamB, 'avgPointsAgainst');
+    const teamBWins = getOverallStat(teamB, 'wins');
+
+    const ctx = document.getElementById('teamComparisonChart').getContext('2d');
+
+    // Save the newly created chart back to the global chart manager variable
+    teamChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Points Per Game', 'Points Allowed Per Game', 'Total Wins'],
+            datasets: [
+                {
+                    label: teamA.displayName,
+                    data: [teamAPPG.toFixed(1), teamAOPPG.toFixed(1), teamAWins],
+                    backgroundColor: `#${teamA.color || '266092'}`, // Fallback colors if missing
+                    borderColor: `#${teamA.color || '266092'}`,
+                    borderWidth: 1
+                },
+                {
+                    label: teamB.displayName,
+                    data: [teamBPPG.toFixed(1), teamBOPPG.toFixed(1), teamBWins],
+                    backgroundColor: `#${teamB.color || 'ff6b00'}`,
+                    borderColor: `#${teamB.color || 'ff6b00'}`,
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#3f3f46' },
+                    ticks: { color: '#a1a1aa' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#a1a1aa' }
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#f4f4f5' } },
+                title: {
+                    display: true,
+                    text: `${teamA.shortDisplayName} vs ${teamB.shortDisplayName} Stats Breakdown`,
+                    color: '#f4f4f5',
+                    font: { size: 16, weight: 'bold' }
+                }
+            }
         }
     });
 }

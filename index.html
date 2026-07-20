@@ -19,38 +19,38 @@
     <header class="dashboard-header">
         <div class="header-content">
 
-                <h1>WNBA Dashboard</h1>
-     
+            <h1>WNBA Dashboard</h1>
+
         </div>
     </header>
 
     <div class="dashboard-grid">
 
         <section class="feed-section">
-                <div class="dashboard-controls">
+            <div class="dashboard-controls">
 
-                    <div class="fav-team-container">
-                        <label for="fav-team-select">⭐ Favorite Team:</label>
-                        <select id="fav-team-select">
-                            <option value="">None</option>
-                            <option value="Dream">Atlanta Dream</option>
-                            <option value="Sky">Chicago Sky</option>
-                            <option value="Sun">Connecticut Sun</option>
-                            <option value="Wings">Dallas Wings</option>
-                            <option value="Valkyries">Golden State Valkyries</option>
-                            <option value="Fever">Indiana Fever</option>
-                            <option value="Aces">Las Vegas Aces</option>
-                            <option value="Sparks">Los Angeles Sparks</option>
-                            <option value="Lynx">Minnesota Lynx</option>
-                            <option value="Liberty">New York Liberty</option>
-                            <option value="Mercury">Phoenix Mercury</option>
-                            <option value="Fire">Portland Fire</option>
-                            <option value="Storm">Seattle Storm</option>
-                            <option value="Tempo">Toronto Tempo</option>
-                            <option value="Mystics">Washington Mystics</option>
-                        </select>
-                    </div>
+                <div class="fav-team-container">
+                    <label for="fav-team-select">⭐ Favorite Team:</label>
+                    <select id="fav-team-select">
+                        <option value="">None</option>
+                        <option value="Dream">Atlanta Dream</option>
+                        <option value="Sky">Chicago Sky</option>
+                        <option value="Sun">Connecticut Sun</option>
+                        <option value="Wings">Dallas Wings</option>
+                        <option value="Valkyries">Golden State Valkyries</option>
+                        <option value="Fever">Indiana Fever</option>
+                        <option value="Aces">Las Vegas Aces</option>
+                        <option value="Sparks">Los Angeles Sparks</option>
+                        <option value="Lynx">Minnesota Lynx</option>
+                        <option value="Liberty">New York Liberty</option>
+                        <option value="Mercury">Phoenix Mercury</option>
+                        <option value="Fire">Portland Fire</option>
+                        <option value="Storm">Seattle Storm</option>
+                        <option value="Tempo">Toronto Tempo</option>
+                        <option value="Mystics">Washington Mystics</option>
+                    </select>
                 </div>
+            </div>
             <h2>Schedule</h2>
             <div id="status-banner" class="loading">Syncing matchups...</div>
             <nav class="date-tabs">
@@ -79,6 +79,56 @@
         </div>
     </div>
 
+    <div class="chart-section">
+        <h2>📊 Team Statistical Comparison</h2>
+        <div class="Team-A-Container">
+            <select id="team-a-select">
+                <option value="">Select Team A</option>
+                <option value="20">Atlanta Dream</option>
+                <option value="19">Chicago Sky</option>
+                <option value="18">Connecticut Sun</option>
+                <option value="3">Dallas Wings</option>
+                <option value="129689">Golden State Valkyries</option>
+                <option value="5">Indiana Fever</option>
+                <option value="17">Las Vegas Aces</option>
+                <option value="6">Los Angeles Sparks</option>
+                <option value="8">Minnesota Lynx</option>
+                <option value="9">New York Liberty</option>
+                <option value="11">Phoenix Mercury</option>
+                <option value="132052">Portland Fire</option>
+                <option value="14">Seattle Storm</option>
+                <option value="131935">Toronto Tempo</option>
+                <option value="16">Washington Mystics</option>
+            </select>
+        </div>
+
+        <div class="Team-B-Container">
+            <select id="team-b-select">
+                <option value="">Select Team B</option>
+                <option value="20">Atlanta Dream</option>
+                <option value="19">Chicago Sky</option>
+                <option value="18">Connecticut Sun</option>
+                <option value="3">Dallas Wings</option>
+                <option value="129689">Golden State Valkyries</option>
+                <option value="5">Indiana Fever</option>
+                <option value="17">Las Vegas Aces</option>
+                <option value="6">Los Angeles Sparks</option>
+                <option value="8">Minnesota Lynx</option>
+                <option value="9">New York Liberty</option>
+                <option value="11">Phoenix Mercury</option>
+                <option value="132052">Portland Fire</option>
+                <option value="14">Seattle Storm</option>
+                <option value="131935">Toronto Tempo</option>
+                <option value="16">Washington Mystics</option>
+            </select>
+        </div>
+
+        <div class="chart-wrapper">
+            <canvas id="teamComparisonChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
 </body>
 

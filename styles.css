@@ -622,7 +622,7 @@ span.team-record {
 }
 
 /* Style the actual Select Dropdown */
-#fav-team-select {
+select {
     appearance: none;
     /* Removes default browser styling (crucial!) */
     -webkit-appearance: none;
@@ -646,16 +646,29 @@ span.team-record {
 }
 
 /* Hover & Focus States */
-#fav-team-select:hover {
+select:hover {
     border-color: #71717a;
 }
 
-#fav-team-select:focus {
+select:focus {
     border-color: #ff6b00;
     box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
 }
 
-#fav-team-select option {
-    background-color: #1e1e1e;
+select option {
+    background-color: #14151f;
     color: #f4f4f5;
+}
+
+.chart-section {
+  background-color: #14151f; 
+  padding: 2rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 400px; 
 }
